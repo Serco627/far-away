@@ -5,13 +5,30 @@ const initialItems = [
   { id: 2, description: "Socks", quantity: 12, packed: false },
   { id: 3, description: "Charger", quantity: 1, packed: true },
 ];
+// Lift the state up
+// 1. Move the state in the parent component -> App()
+// 2. Pass the state down to the child component as a prop in the child component -> PackingList items={items}
+// 3. Pass the function that updates the state down to the child component as a prop -> Form onAddItems={handleAddItems}
+// 4. Call the function in the child component (Form) to update the state -> onAddItems(newItem)
 
 export default function App() {
+  const [items, setItems] = useState([]);
+
+  function handleAddItems(item) {
+    const updatedItems = [...items, item];
+    setItems(updatedItems);
+  }
+
+  function handleDeleteItem(id) {
+    const updatedItems = items.filter((item) => item.id !== id);
+    setItems(updatedItems);
+  }
+
   return (
     <div className="app">
       <Logo />
-      <Form />
-      <PackingList />
+      <Form onAddItems={handleAddItems} />
+      <PackingList items={items} onDeleteItem={handleDeleteItem} />
       <Stats />
     </div>
   );
@@ -25,7 +42,7 @@ function Logo() {
   );
 }
 
-function Form() {
+function Form({ onAddItems }) {
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState(1);
 
@@ -42,6 +59,7 @@ function Form() {
     const newItem = { description, quantity, packed: false, id: Date.now() };
     if (!description) return;
     console.log(newItem);
+    onAddItems(newItem);
     setDescription("");
     setQuantity(1);
   }
@@ -75,25 +93,25 @@ function Form() {
 // 4. Create a function to handle the change event -> handleSelectChange
 // 5. Update the state with the value of the select field -> setQuantity(Number(event.target.value))
 
-function PackingList() {
+function PackingList({ items, onDeleteItem }) {
   return (
     <div className="list">
       <ul>
-        {initialItems.map((item) => {
-          return <Item item={item} key={initialItems.id} />;
+        {items.map((item) => {
+          return <Item item={item} key={item.id} onDeleteItem={onDeleteItem} />;
         })}
       </ul>
     </div>
   );
 }
 
-function Item({ item }) {
+function Item({ item, onDeleteItem }) {
   return (
     <li>
       <span style={item.packed ? { textDecoration: "line-through" } : {}}>
         {item.quantity} {item.description}
       </span>
-      <button>❌</button>
+      <button onClick={() => onDeleteItem(item.id)}>❌</button>
     </li>
   );
 }
