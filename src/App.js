@@ -161,13 +161,13 @@ function Stats({ items }) {
   return (
     <footer className="stats">
       {showConfetti && <Confetti />}
-      <p>
+      <em>
         {percentage === 100
-          ? `You are ready to go! Happy vacation! 🎉`
+          ? `🎉 You are ready to go! Happy vacation! 🛫`
           : numItems === 0
-          ? `You have no items in your list. Put something in the list.`
+          ? `You have no items in your list. Start adding some items to your packing list. 🚀`
           : `💼 You have ${numItems} items in your list and you already packed ${numPacked} (${percentage}%) 💼`}
-      </p>
+      </em>
     </footer>
   );
 }
