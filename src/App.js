@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Confetti from "react-confetti";
 
 // Lift the state up
 // 1. Move the state in the parent component -> App()
@@ -44,7 +45,7 @@ export default function App() {
         onDeleteItem={handleDeleteItem}
         onToggleItem={handleToggleItem}
       />
-      <Stats />
+      <Stats items={items} />
     </div>
   );
 }
@@ -73,7 +74,6 @@ function Form({ onAddItems }) {
     event.preventDefault();
     const newItem = { description, quantity, packed: false, id: Date.now() };
     if (!description) return;
-    console.log(newItem);
     onAddItems(newItem);
     setDescription("");
     setQuantity(1);
@@ -145,8 +145,32 @@ function Item({ item, onDeleteItem, onToggleItem }) {
   );
 }
 
-function Stats() {
+function Stats({ items }) {
+  const numItems = items.length;
+  const numPacked = items.filter((item) => item.packed).length;
+  const percentage = Math.round((numPacked / numItems) * 100);
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  useEffect(() => {
+    if (percentage === 100) {
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 5000);
+    }
+  }, [percentage]);
+
   return (
-    <footer className="stats"> 💼 You have x items in your list 💼</footer>
+    <footer className="stats">
+      {showConfetti && <Confetti />}
+      <p>
+        {percentage === 100
+          ? `You are ready to go! Happy vacation! 🎉`
+          : numItems === 0
+          ? `You have no items in your list. Put something in the list.`
+          : `💼 You have ${numItems} items in your list and you already packed ${numPacked} (${percentage}%) 💼`}
+      </p>
+    </footer>
   );
 }
+// {/* {numItems === 0
+//   ? `You have no items in your list. Put something in the list.`
+//   : `💼 You have ${numItems} items in your list and you already packed ${numPacked} (${percentage}%) :  💼`} */}
